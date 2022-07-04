@@ -1,6 +1,7 @@
 import { compose, applyMiddleware } from 'redux';
 import { legacy_createStore as createStore } from 'redux';
-// import { persistStore, persistReducer } from 'redux-persist';
+import { persistStore, persistReducer } from 'redux-persist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // import storage from 'redux-persist/lib/storage';
 import logger from 'redux-logger';
 import thunk from 'redux-thunk';
@@ -18,16 +19,20 @@ const composeEnhancer =
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) ||
   compose;
 
-// const persistConfig = {
-//   key: 'root',
-//   storage,
-//   blacklist: ['user'],
-// };
+const persistConfig = {
+  key: 'root',
+  storage: AsyncStorage,
+  blacklist: ['user'],
+};
 
-// const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const composedEnhancers = composeEnhancer(applyMiddleware(...middleWares));
 
-export const store = createStore(rootReducer, undefined, composedEnhancers);
+export const store = createStore(
+  persistedReducer,
+  undefined,
+  composedEnhancers
+);
 
-// export const persistor = persistStore(store);
+export const persistor = persistStore(store);
